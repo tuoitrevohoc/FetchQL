@@ -8,7 +8,7 @@
 import Foundation
 
 /// The client provider
-protocol RequestDecorator {
+public protocol RequestDecorator {
     
     /// Decorate the request
     func decorate(request: inout URLRequest)

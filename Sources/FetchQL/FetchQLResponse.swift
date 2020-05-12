@@ -8,19 +8,19 @@
 import Foundation
 
 /// the fetch QL response Error
-struct FetchQLResponseError: Decodable {
+public struct FetchQLResponseError: Decodable {
     /// message of the error
-    let message: String
+    public let message: String
     
     /// description of the error
-    let description: String?
+    public let description: String?
 }
 
 /// The response class
-struct FetchQLResponse: Decodable {
+public struct FetchQLResponse: Decodable {
     
     /// errors if there are errors
-    let errors: [FetchQLResponseError]?
+    public let errors: [FetchQLResponseError]?
     
     /// the current container
     let current: KeyedDecodingContainer<CodingKeys>
@@ -37,7 +37,7 @@ extension FetchQLResponse {
     /// Fetch json
     /// - Parameter decoder: the decoder
     /// - Throws: the description
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         current = try decoder.container(keyedBy: CodingKeys.self)
         
         if current.contains(.errors) {

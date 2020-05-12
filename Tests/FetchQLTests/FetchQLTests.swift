@@ -1,6 +1,6 @@
 import XCTest
 import Combine
-@testable import FetchQL
+import FetchQL
 
 final class FetchQLTests: XCTestCase {
     

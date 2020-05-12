@@ -8,7 +8,7 @@
 import Foundation
 
 /// the graphql error
-enum FetchQLError: Error {
+public enum FetchQLError: Error {
     case requestError(error: Error)
     case responseError(errors: [FetchQLResponseError])
     

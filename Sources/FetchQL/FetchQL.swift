@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 
-struct FetchQLQueryRequest<Parameter: Encodable>: Encodable {
+fileprivate struct FetchQLQueryRequest<Parameter: Encodable>: Encodable {
     /// the fetch query
     var query: String
     
@@ -9,7 +9,7 @@ struct FetchQLQueryRequest<Parameter: Encodable>: Encodable {
     var variables: Parameter
 }
 
-struct FetchQLMutationRequest<Parameter: Encodable>: Encodable {
+fileprivate struct FetchQLMutationRequest<Parameter: Encodable>: Encodable {
     /// The mutation String
     var mutation: String
     
@@ -18,7 +18,7 @@ struct FetchQLMutationRequest<Parameter: Encodable>: Encodable {
 }
 
 /// The FetchQL client
-class FetchQL {
+public class FetchQL {
     
     /// the endpoint
     let endPoint: URL
@@ -27,14 +27,14 @@ class FetchQL {
     let decorators: [RequestDecorator]
 
     /// the result
-    typealias FetchQLPublisher<Response> = AnyPublisher<Response, FetchQLError>
+    public typealias FetchQLPublisher<Response> = AnyPublisher<Response, FetchQLError>
     
     /// Initialize with
     ///
     /// - Parameters:
     ///   - endPoint: the endpoint
     ///   - decorators: The request decorators
-    init(endPoint: URL, decorators: [RequestDecorator] = []) {
+    public init(endPoint: URL, decorators: [RequestDecorator] = []) {
         self.endPoint = endPoint
         self.decorators = decorators
     }
@@ -46,7 +46,7 @@ class FetchQL {
     ///   - variables: list of variables
     ///   - type: expected response type
     /// - Returns: Publisher of the result
-    func query<ParameterType: Encodable, ResponseType: Decodable>(
+    public func query<ParameterType: Encodable, ResponseType: Decodable>(
         _ query: String,
         variables: ParameterType,
         for type: ResponseType.Type
@@ -62,7 +62,7 @@ class FetchQL {
     ///   - variables: list of variables
     ///   - type: expected response type
     /// - Returns: Publisher of the result
-    func mutation<ParameterType: Encodable, ResponseType: Decodable>(
+    public func mutation<ParameterType: Encodable, ResponseType: Decodable>(
         _ mutation: String,
         variables: ParameterType,
         for type: ResponseType.Type
@@ -79,7 +79,7 @@ class FetchQL {
     ///   - type: type of the expected data
     ///
     /// - Returns: a publisher
-    func subscribe<ParameterType: Encodable, ResponseType: Decodable>(
+    public func subscribe<ParameterType: Encodable, ResponseType: Decodable>(
         _ query: String,
         parameter: ParameterType,
         for type: ResponseType.Type
