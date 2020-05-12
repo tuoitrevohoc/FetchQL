@@ -8,8 +8,8 @@
 import Foundation
 
 /// The client provider
-protocol ClientProvider {
+protocol RequestDecorator {
     
-    /// given a connection to connect to FetchQL
-    func request(for url: URL) -> URLRequest
+    /// Decorate the request
+    func decorate(request: inout URLRequest)
 }

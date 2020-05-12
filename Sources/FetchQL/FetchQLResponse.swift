@@ -7,22 +7,6 @@
 
 import Foundation
 
-/// the graphql error
-enum FetchQLError: Error {
-    case requestError(error: Error)
-    case responseError(errors: [FetchQLResponseError])
-    
-    static func from(error: Error) -> FetchQLError {
-        switch error {
-        case FetchQLError.responseError(let errors):
-            return .responseError(errors: errors)
-        default:
-            return .requestError(error: error)
-        }
-    }
-}
-
-
 /// the fetch QL response Error
 struct FetchQLResponseError: Decodable {
     /// message of the error
@@ -66,7 +50,7 @@ extension FetchQLResponse {
     
     /// Lazily decode the data with the type
     /// - Returns: the data
-    func data<Response: Decodable>(type: Response.Type) throws -> Response {
+    func data<Response: Decodable>(of type: Response.Type) throws -> Response {
         
         if let errors = errors {
             throw FetchQLError.responseError(errors: errors)

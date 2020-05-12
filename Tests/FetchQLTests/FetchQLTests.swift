@@ -4,13 +4,11 @@ import Combine
 
 final class FetchQLTests: XCTestCase {
     
-    class ApiKeyClientProvider: ClientProvider {
-        func request(for url: URL) -> URLRequest {
-            let apiKey = "da2-kp5nkn4vibflfm2lomr2yjwnp4"
-            var request = URLRequest(url: url)
+    class ApiKeyClientProvider: RequestDecorator {
+        let apiKey = "da2-kp5nkn4vibflfm2lomr2yjwnp4"
+        
+        func decorate(request: inout URLRequest) {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
-            
-            return request
         }
     }
     
@@ -25,13 +23,10 @@ final class FetchQLTests: XCTestCase {
     
     static let endPoint = URL(string: "https://fgetgc2rcnawzgkobid4wphsre.appsync-api.ap-southeast-1.amazonaws.com/graphql")!
     var cancellable: AnyCancellable?
-    let fetchQL = FetchQL(endPoint: endPoint, provider: ApiKeyClientProvider())
+    let fetchQL = FetchQL(endPoint: endPoint, decorators: [ApiKeyClientProvider()])
     
     func testQuery() throws {
         let requestFinished = expectation(description: "Request finished")
-        
-        let endPoint = URL(string: "https://fgetgc2rcnawzgkobid4wphsre.appsync-api.ap-southeast-1.amazonaws.com/graphql")!
-        let fetchQL = FetchQL(endPoint: endPoint, provider: ApiKeyClientProvider())
         let query = """
            query Stocks($query: String) {
                stocks(query: $query) {
@@ -41,7 +36,7 @@ final class FetchQLTests: XCTestCase {
            }
         """
         
-        cancellable = try fetchQL.query(query, parameter: [ "query": "AMZ"], for: QueryResult.self)
+        cancellable = fetchQL.query(query, variables: [ "query": "AMZ"], for: QueryResult.self)
             .sink(receiveCompletion: { completion in
                 
                 switch completion {
@@ -70,18 +65,16 @@ final class FetchQLTests: XCTestCase {
            }
         """
         
-        cancellable = try fetchQL.query(query, parameter: [ "query": "AMZ"], for: QueryResult.self)
+        cancellable = fetchQL.query(query, variables: [ "query": "AMZ"], for: QueryResult.self)
             .sink(receiveCompletion: { completion in
                 
                 switch completion {
                     case .failure(let error):
-                        print(error)
                         switch error {
                         case .responseError(let errors):
                             XCTAssertEqual(1, errors.count)
-                            print(error)
                         default:
-                            XCTFail("Should return another error!")
+                            XCTFail("Should return error from server error!")
                         }
                     case .finished:
                         XCTFail("Query should not success")
