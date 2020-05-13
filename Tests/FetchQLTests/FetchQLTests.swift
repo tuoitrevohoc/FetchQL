@@ -4,10 +4,10 @@ import FetchQL
 
 final class FetchQLTests: XCTestCase {
     
-    class ApiKeyClientProvider: RequestDecorator {
+    class ApiKeyPlugin: FetchQLPlugIn {
         let apiKey = "da2-kp5nkn4vibflfm2lomr2yjwnp4"
         
-        func decorate(request: inout URLRequest) {
+        func decorate(request: inout URLRequest, forWebSocket isWebSocket: Bool) {
             request.addValue(apiKey, forHTTPHeaderField: "x-api-key")
         }
     }
@@ -23,7 +23,7 @@ final class FetchQLTests: XCTestCase {
     
     static let endPoint = URL(string: "https://fgetgc2rcnawzgkobid4wphsre.appsync-api.ap-southeast-1.amazonaws.com/graphql")!
     var cancellable: AnyCancellable?
-    let fetchQL = FetchQL(endPoint: endPoint, decorators: [ApiKeyClientProvider()])
+    let fetchQL = FetchQL(endPoint: endPoint, plugin: ApiKeyPlugin())
     
     func testQuery() throws {
         let requestFinished = expectation(description: "Request finished")

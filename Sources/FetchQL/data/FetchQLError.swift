@@ -10,7 +10,7 @@ import Foundation
 /// the graphql error
 public enum FetchQLError: Error {
     case requestError(error: Error)
-    case responseError(errors: [FetchQLResponseError])
+    case responseError(errors: [ErrorData])
     
     static func from(error: Error) -> FetchQLError {
         switch error {
