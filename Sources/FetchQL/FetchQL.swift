@@ -157,7 +157,7 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
                 subscriptions[id]?.onError(error: .responseError(errors: [error]))
             }
         case .complete(let id):
-            subscriptions[id].onComplete()
+            subscriptions[id]?.onComplete()
         default: break
         }
     }
