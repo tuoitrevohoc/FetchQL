@@ -17,19 +17,15 @@ public struct AppSyncPlugin: FetchQLPlugIn {
     }
     
     /// Decorate the request
+    ///
     /// - Parameters:
     ///   - request: the request
     ///   - isWebSocket: is this a http request
     public func decorate(request: inout URLRequest, forWebSocket isWebSocket: Bool) {
         if isWebSocket {
             if  let host = request.url?.host,
-                let urlString = request.url?.absoluteString
-                    .replacingOccurrences(of: ".appsync-api.", with: ".appsync-realtime-api.")
-                    .replacingOccurrences(of: "http", with: "ws") {
-                let headers = [
-                    "host": host,
-                    "x-api-key": apiKey
-                ]
+                let urlString = getWebsocketUrl(endPoint: request.url?.absoluteString) {
+                let headers = [ "host": host, "x-api-key": apiKey ]
                 let encoder = JSONEncoder()
                 
                 if let data = try? encoder.encode(headers),
@@ -42,6 +38,21 @@ public struct AppSyncPlugin: FetchQLPlugIn {
         }
     }
     
+    /// Get the websocket url from the socket url
+    ///
+    /// - Parameter endPoint: endPoint
+    /// - Returns: the websocket URL
+    fileprivate func getWebsocketUrl(endPoint: String?) -> String? {
+        return endPoint?
+            .replacingOccurrences(of: ".appsync-api.", with: ".appsync-realtime-api.")
+            .replacingOccurrences(of: "http", with: "ws")
+    }
+    
+    /// Get The message coder
+    ///
+    /// - Parameter endPoint: the endpoint to sign the the quest
+    /// 
+    /// - Returns: the message coder
     public func messageCoder(for endPoint: URL) -> MessageCoder {
         AppSyncCoder(endPoint: endPoint, apiKey: apiKey)
     }

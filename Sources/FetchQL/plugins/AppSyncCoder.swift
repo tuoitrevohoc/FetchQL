@@ -25,6 +25,10 @@ extension AppSyncClientMessage: Encodable {
         case extensions
     }
     
+    /// Encode the client message for AWS AppSync Server
+    ///
+    /// - Parameter encoder: the encoder
+    /// - Throws: error when encoding
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         
@@ -83,25 +87,10 @@ struct AppSyncCoder: MessageCoder {
         let authorization = [
             "host": endPoint.host,
             "x-api-key": apiKey,
-            "x-amz-user-agent": "aws-amplify/3.2.5 js",
-            "x-amz-date": "\(Date().amzDate)"
         ]
         
         let appSyncMessage = AppSyncClientMessage(message: message, authorization: authorization)
         let data = try encoder.encode(appSyncMessage)
-        let result = String(data: data, encoding: .utf8)!
-        
-        print(result)
-        return result
-    }
-}
-
-extension Date {
-    fileprivate var amzDate: String {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        let value = formatter.string(from: self)
-        return value.replacingOccurrences(of: "-", with: "")
-                    .replacingOccurrences(of: ":", with: "")
+        return String(data: data, encoding: .utf8)!
     }
 }

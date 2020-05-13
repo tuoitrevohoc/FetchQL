@@ -48,5 +48,6 @@ class SubscriptionPublisher: Publisher {
         let subscription = FetchQLSubscription(subscriber: subscriber, id: id, manager: manager)
             
         manager?.addSubscripton(id: id, handler: subscription)
+        subscriber.receive(subscription: subscription)
     }
 }

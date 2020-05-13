@@ -1,6 +1,12 @@
 import Foundation
 import Combine
 
+enum SubscriptionState: Equatable {
+    case initialized
+    case acknownledged
+    case cancelled
+}
+
 /// The FetchQL client
 public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
     
@@ -12,6 +18,9 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
     
     /// the list of subscriptions
     var subscriptions = [String: SubscriptionHandler]()
+    
+    /// the subscription states
+    var subscriptionStates = [String: SubscriptionState]()
     
     /// the socket connection
     var connection: WebSocketConnection? = nil
@@ -142,8 +151,9 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
     func processMessage(message: ServerMessage) {
         switch message {
         case .data(let id, let payload):
-            print("Call Back")
             subscriptions[id]?.onMessage(payload: payload)
+        case .startAck(let id):
+            acknowledge(id: id)
         case .error(let id, let payload):
             if let error = try? payload.get(as: ErrorData.self) {
                 subscriptions[id]?.onError(error: .responseError(errors: [error]))
@@ -159,6 +169,18 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
         print(error)
     }
     
+    /// Acknownledge a subscription
+    ///
+    /// - Parameter id: the subscrion
+    fileprivate func acknowledge(id: String) {
+        let state = subscriptionStates[id]
+        if case .initialized = state {
+            subscriptionStates[id] = .acknownledged
+        } else if case .cancelled = subscriptionStates[id] {
+            removeSubscription(id: id)
+        }
+    }
+    
     /// Create and prepare the request
     ///
     /// - Parameter url: the url
@@ -171,15 +193,19 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
     ///   - id: id of the subscription
     ///   - handler: the handler
     func addSubscripton(id: String, handler: SubscriptionHandler) {
-        print("add subscription")
         subscriptions[id] = handler
+        subscriptionStates[id] = .initialized
     }
     
     /// Remove subscription
     ///
     /// - Parameter id: id of the subscription
     func removeSubscription(id: String) {
-        connection?.queueMessage(message: ClientMessages.stop(id: id))
-        subscriptions.removeValue(forKey: id)
+        if subscriptionStates[id] != .initialized {
+            connection?.queueMessage(message: ClientMessages.stop(id: id))
+            subscriptions.removeValue(forKey: id)
+        } else {
+            subscriptionStates[id] = .cancelled
+        }
     }
 }

@@ -58,7 +58,6 @@ final class FetchQLSubscription<SubscriberType: Subscriber>:
     /// onComing message
     /// - Parameter payload: the message payload
     func onMessage(payload: MessagePayload) {
-        print("Calling subscriber receive")
         _ = subscriber?.receive(payload)
     }
     

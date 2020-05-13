@@ -19,22 +19,22 @@ final class ClientMessageTests: XCTestCase {
     
     func testEncoding() throws {
         XCTAssertEqual(
-            #"{"type":"GQL_CONNECTION_INIT"}"#,
+            #"{"type":"connection_init"}"#,
            encodeJson(message: ClientMessages.connectionInit)
         )
         
         XCTAssertEqual(
-            #"{"type":"GQL_CONNECTION_TERMINATE"}"#,
+            #"{"type":"connection_terminate"}"#,
             encodeJson(message: ClientMessages.connectionTerminate)
         )
         
         XCTAssertEqual(
-            #"{"type":"GQL_START","id":"123","payload":{"query":"select","variables":"123"}}"#,
+            #"{"type":"start","id":"123","payload":{"query":"select","variables":"123"}}"#,
             encodeJson(message: .start(id: "123", query: "select", variables: "123"))
         )
         
         XCTAssertEqual(
-            #"{"type":"GQL_STOP","id":"123"}"#,
+            #"{"type":"stop","id":"123"}"#,
             encodeJson(message: ClientMessages.stop(id: "123"))
         )
     }

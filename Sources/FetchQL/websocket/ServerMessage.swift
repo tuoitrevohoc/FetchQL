@@ -11,6 +11,7 @@ import Foundation
 enum ServerMessageType: String {
     case connectionError = "connection_error"
     case connectionAck = "connection_ack"
+    case startAck = "start_ack"
     case data = "data"
     case error = "error"
     case complete = "complete"
@@ -45,6 +46,7 @@ public struct MessagePayload {
 public enum ServerMessage {
     case connectionError
     case connectionAck
+    case startAck(id: String)
     case data(id: String, payload: MessagePayload)
     case error(id: String, payload: MessagePayload)
     case complete(id: String)
@@ -87,6 +89,9 @@ extension ServerMessage: Decodable {
             let dataContainer = try container.nestedContainer(keyedBy: MessagePayload.CodingKeys.self, forKey: .payload)
             let payload = MessagePayload(container: dataContainer)
             self = .error(id: id, payload: payload)
+        case .startAck:
+            let id = try container.decode(String.self, forKey: .id)
+            self = .startAck(id: id)
         case .none:
             throw MessageDecodeError.unknownType
         }

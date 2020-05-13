@@ -68,11 +68,16 @@ class WebSocketConnection {
                send(message: stringMessage)
             } else {
                 queues.append(stringMessage)
+
                 resume()
             }
         }
     }
     
+    /// Encode the message
+    ///
+    /// - Parameter message: the message
+    /// - Returns: Websocket Message
     func encode<Variable: Encodable>(message: ClientMessage<Variable>) -> URLSessionWebSocketTask.Message? {
         
         if let value = try? coder.encode(message: message) {
@@ -94,11 +99,7 @@ class WebSocketConnection {
     ///
     /// - Parameter message: message
     fileprivate func send(message: URLSessionWebSocketTask.Message) {
-        print("Send message \(message)")
-        
         task.send(message) { [weak self] error in
-            print("Sent")
-            
             if let error = error {
                 self?.processError(error: error)
             }
@@ -110,8 +111,6 @@ class WebSocketConnection {
     /// The message handler
     /// - Parameter result: the result
     fileprivate func receiveMessage(result: Result<URLSessionWebSocketTask.Message, Error>) {
-        print("Receive Message")
-        
         switch result {
         case .success(let message):
             processMessage(message: message)
@@ -126,23 +125,19 @@ class WebSocketConnection {
     fileprivate func processMessage(message: URLSessionWebSocketTask.Message) {
         switch message {
         case .data:
-            print("Cannot parse data")
+            processError(error: FetchQLError.notSupported)
         case .string(let value):
-            print("Message received \(value)")
-            
             if let serverMessage = try? coder.decode(payload: value) {
                 processMessage(message: serverMessage)
             }
         @unknown default:
-            print("Not supported")
+            processError(error: FetchQLError.notSupported)
         }
     }
     
     /// Process the message
     /// - Parameter message: message
     fileprivate func processMessage(message: ServerMessage) {
-        print("Receive Message \(message)")
-        
         switch message {
         case .connectionAck:
             state = .active

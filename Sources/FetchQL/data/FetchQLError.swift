@@ -11,6 +11,7 @@ import Foundation
 public enum FetchQLError: Error {
     case requestError(error: Error)
     case responseError(errors: [ErrorData])
+    case notSupported
     
     static func from(error: Error) -> FetchQLError {
         switch error {
