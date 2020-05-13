@@ -18,8 +18,12 @@ protocol SubscriptionHandler {
     /// the subscription callback
     /// - Parameter error: error
     func onError(error: FetchQLError)
+    
+    /// Subscription completed
+    func onComplete()
 }
 
+/// The FetchQL Subscription 
 final class FetchQLSubscription<SubscriberType: Subscriber>:
         Subscription, SubscriptionHandler
         where SubscriberType.Input == MessagePayload,
@@ -53,6 +57,11 @@ final class FetchQLSubscription<SubscriberType: Subscriber>:
         }
         
         subscriber = nil
+    }
+    
+    /// There is no message
+    func onComplete() {
+        subscriber?.receive(completion: .finished)
     }
     
     /// onComing message

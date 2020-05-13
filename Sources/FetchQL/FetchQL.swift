@@ -100,8 +100,6 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
             
             plugin?.decorate(request: &request, forWebSocket: true)
             request.addValue("graphql-ws", forHTTPHeaderField: "Sec-WebSocket-Protocol")
-            request.addValue("8NEI3eqmwrjbJ+2sT4KrsA==", forHTTPHeaderField: "Sec-WebSocket-Key")
-            request.addValue("x-webkit-deflate-frame", forHTTPHeaderField: "Sec-WebSocket-Extensions")
             
             let coder = plugin?.messageCoder(for: endPoint) ?? DefaultMessageCoder()
             
@@ -158,6 +156,8 @@ public class FetchQL: SubscriptionManager, WebSocketConnectionDelegate {
             if let error = try? payload.get(as: ErrorData.self) {
                 subscriptions[id]?.onError(error: .responseError(errors: [error]))
             }
+        case .complete(let id):
+            subscriptions[id].onComplete()
         default: break
         }
     }

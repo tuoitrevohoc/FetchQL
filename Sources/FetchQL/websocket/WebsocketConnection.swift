@@ -63,6 +63,10 @@ class WebSocketConnection {
     ///
     /// - Parameter message: the message to send
     func queueMessage<Variable: Encodable>(message: ClientMessage<Variable>) {
+#if DEBUG
+        print("Send message: \(message)")
+#endif
+        
         if let stringMessage = encode(message: message) {
             if case .connectionInit = message {
                send(message: stringMessage)
@@ -138,6 +142,9 @@ class WebSocketConnection {
     /// Process the message
     /// - Parameter message: message
     fileprivate func processMessage(message: ServerMessage) {
+#if DEBUG
+        print("Receive message: \(message)")
+#endif
         switch message {
         case .connectionAck:
             state = .active

@@ -19,6 +19,7 @@ final class FetchQLSubscriptionTests: XCTestCase {
         let endPoint = URL(string: "https://6652q43fafcrhgnruwenl4f7i4.appsync-api.ap-southeast-1.amazonaws.com/graphql")!
         let fetchQL = FetchQL(endPoint: endPoint, plugin: AppSyncPlugin(apiKey: "da2-d4iln5ffinf53oropocnocpjsm"))
         
+        let requestFinished = expectation(description: "Request finished")
         let query = """
            subscription OnCreateTodo {
                onCreateTodo {
@@ -29,20 +30,21 @@ final class FetchQLSubscriptionTests: XCTestCase {
         """
         
         cancellable = fetchQL.subscribe(
-            query, variables: [String:String](), for: SubscriptionResult.self
-        )
+            query, variables: [String:String](), for: SubscriptionResult.self)
             .sink(receiveCompletion: { completion in
                 switch completion {
                     case .failure:
                         XCTFail("Query should success")
                     case .finished:
-                        XCTFail("Already cancelled")
+                        requestFinished.fulfill()
                 }
             }){ result in
                 print(result.onCreateTodo)
             }
         
         cancellable?.cancel()
+        
+        wait(for: [requestFinished], timeout: 80.0)
     }
 
 }
